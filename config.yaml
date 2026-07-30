@@ -1,0 +1,36 @@
+# ---------------------------------------------------------------
+# Job Alert Agent - Configuration
+# ---------------------------------------------------------------
+
+keywords:
+  - "AI Engineer"
+  - "Machine Learning Engineer"
+  - "Remote Developer"
+  - "Python Developer"
+  - "LLM Engineer"
+
+# Only include jobs posted within this many hours (freshness filter)
+max_age_hours: 2
+
+sources:
+  remoteok: true
+  remotive: true
+  arbeitnow: true
+  weworkremotely_rss: true
+
+llm_model_anthropic: "claude-sonnet-4-6"
+
+# Google Sheet used as the dedup log (Section: Deduplication / State Store)
+# Get this ID from the sheet's URL: https://docs.google.com/spreadsheets/d/<THIS_PART>/edit
+google_sheet_id: "1vLWgKNnclO4BepPcpAwJlAD7f1ioq8rGSzZ04H2Nf5Q"
+
+# WhatsApp Cloud API settings (Section: Delivery Layer)
+whatsapp_cloud_api:
+  phone_number_id_env: "WHATSAPP_PHONE_NUMBER_ID"
+  access_token_env: "WHATSAPP_TOKEN"
+  # Comma-separated numbers (international format, no "+" or spaces) read from
+  # this env var / GitHub secret at runtime - keeps recipient numbers out of
+  # version control. Either your test recipients (Meta test number) or every
+  # opted-in member of your broadcast list / group.
+  recipients_env: "WHATSAPP_RECIPIENTS"
+  recipients: []

@@ -1,0 +1,84 @@
+"""
+reasoner.py
+Component 3: AI Reasoning Layer
+
+Sends the raw, collected job list to Claude with the prompt structure
+specified in the assignment brief: keep only jobs matching the keywords,
+drop anything already in <already_sent>, and return a WhatsApp-ready
+digest (or a fixed "no new jobs" string).
+
+Note: local keyword/freshness filtering already happened in collector.py,
+and local ID-based dedup already happened in state_store.py - Claude is
+still given the full context (<already_sent> ids) and asked to re-check
+both, as a second pass to catch near-duplicates across sources (e.g. the
+same role posted on both RemoteOK and Remotive with different IDs) that
+exact-ID matching alone would miss.
+"""
+
+import os
+import json
+from anthropic import Anthropic
+
+PROMPT_TEMPLATE = """<role>You are a job-alert formatting assistant for a WhatsApp group.</role>
+<instruction>
+From the job listings provided in <jobs>, keep only roles matching
+"{keywords}" posted within the last {max_age_hours} hours. Remove any job
+whose "id" appears in <already_sent>. Also remove near-duplicate postings
+(same role, same company, appearing under a different id from another
+source) - keep only the first occurrence. Output a WhatsApp-ready digest
+using the <output_format> below. If no new jobs qualify, output exactly:
+"No new matching jobs this cycle."
+</instruction>
+<jobs>{jobs_json}</jobs>
+<already_sent>{sent_ids_json}</already_sent>
+<output_format>
+*New Job Alerts* 🚀
+1. [Title] – [Company] – [Location]
+   Apply: [link]
+(repeat for each job, max 8 per message)
+</output_format>
+"""
+
+
+def build_digest(jobs: list, sent_ids: set, config: dict) -> str | None:
+    """Calls Claude with the brief's prompt format. Returns the WhatsApp
+    message text, or None if there's nothing new to send."""
+    if not jobs:
+        return None
+
+    prompt = PROMPT_TEMPLATE.format(
+        keywords=", ".join(config.get("keywords", [])),
+        max_age_hours=config.get("max_age_hours", 2),
+        jobs_json=json.dumps(jobs, indent=2)[:12000],
+        sent_ids_json=json.dumps(list(sent_ids)),
+    )
+
+    try:
+        client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        resp = client.messages.create(
+            model=config.get("llm_model_anthropic", "claude-sonnet-4-6"),
+            max_tokens=1500,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+    except Exception as e:
+        print(f"[reasoner] Claude call failed: {e}")
+        text = _fallback_format(jobs, sent_ids)
+
+    if text.strip() == "No new matching jobs this cycle.":
+        return None
+
+    return text
+
+
+def _fallback_format(jobs: list, sent_ids: set) -> str:
+    """Deterministic formatter used only if the Claude API call itself
+    errors out, so a transient API issue doesn't lose a run entirely."""
+    unseen = [j for j in jobs if str(j["id"]) not in sent_ids][:8]
+    if not unseen:
+        return "No new matching jobs this cycle."
+    lines = ["*New Job Alerts* 🚀"]
+    for i, j in enumerate(unseen, 1):
+        lines.append(f"{i}. {j['title']} – {j.get('company','')}")
+        lines.append(f"   Apply: {j['url']}")
+    return "\n".join(lines)
