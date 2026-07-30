@@ -3,14 +3,11 @@
 # ---------------------------------------------------------------
 
 keywords:
-  - "AI Engineer"
-  - "Machine Learning Engineer"
-  - "Remote Developer"
-  - "Python Developer"
-  - "LLM Engineer"
+  - "Engineer"
+  - "Developer"
 
 # Only include jobs posted within this many hours (freshness filter)
-max_age_hours: 2
+max_age_hours: 720
 
 sources:
   remoteok: true
