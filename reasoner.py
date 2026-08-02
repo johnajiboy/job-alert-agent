@@ -86,7 +86,7 @@ def build_digest(jobs: list, sent_ids: set, config: dict) -> str | None:
         current_time_utc=datetime.now(timezone.utc).isoformat(),
         keywords=", ".join(config.get("keywords", [])),
         max_age_hours=config.get("max_age_hours", 2),
-        jobs_json=json.dumps(jobs, indent=2)[:12000],
+        jobs_json=json.dumps(jobs[:30], indent=2),
         sent_ids_json=json.dumps(list(sent_ids)),
     )
 
