@@ -26,16 +26,41 @@ From the job listings provided in <jobs>, keep only roles matching
 whose "id" appears in <already_sent>. Also remove near-duplicate postings
 (same role, same company, appearing under a different id from another
 source) - keep only the first occurrence. Output a WhatsApp-ready digest
-using the <output_format> below. If no new jobs qualify, output exactly:
+using the <output_format> below, keeping at most 2 jobs per message
+(WhatsApp caps messages at 4096 characters and this fuller format takes
+more space per job). If no new jobs qualify, output exactly:
 "No new matching jobs this cycle."
+
+CRITICAL - do not fabricate: only include the "Key Responsibilities",
+"Requirements", contact email, and deadline sections/lines if that
+information is genuinely present in the job's source "description" text.
+If the description doesn't mention responsibilities, requirements, a
+contact email, or a deadline, omit that section/line entirely rather than
+inventing or guessing content. The overview sentence(s) must also be a
+faithful summary of the actual description, not invented detail.
 </instruction>
 <jobs>{jobs_json}</jobs>
 <already_sent>{sent_ids_json}</already_sent>
 <output_format>
-*New Job Alerts* 🚀
-1. [Title] – [Company] – [Location]
-   Apply: [link]
-(repeat for each job, max 8 per message)
+🚀 *[Title]*
+🏢 Company: [Company]
+📍 Location: [Location]
+🏠 Work Mode: [Remote/Hybrid/Onsite, if stated - otherwise omit this line]
+
+[2-4 sentence overview of the role, faithfully summarizing the source
+description]
+
+*Key Responsibilities:*
+- [only if genuinely present in the source description]
+
+*Requirements:*
+- [only if genuinely present in the source description]
+
+📧 Contact: [only if an email is genuinely present in the source description]
+⏳ Deadline: [only if a deadline is genuinely present in the source description]
+🔗 Apply: [link]
+
+(repeat for each job, max 2 per message)
 </output_format>
 """
 

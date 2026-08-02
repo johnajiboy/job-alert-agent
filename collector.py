@@ -44,7 +44,7 @@ def fetch_remoteok():
                 "url": item.get("url", ""),
                 "posted_at": item.get("date", ""),
                 "source": "RemoteOK",
-                "description": item.get("description", "")[:500],
+                "description": item.get("description", "")[:2500],
             })
     except Exception as e:
         print(f"[collector] RemoteOK fetch failed: {e}")
@@ -65,7 +65,7 @@ def fetch_remotive():
                 "url": item.get("url", ""),
                 "posted_at": item.get("publication_date", ""),
                 "source": "Remotive",
-                "description": (item.get("description") or "")[:500],
+                "description": (item.get("description") or "")[:2500],
             })
     except Exception as e:
         print(f"[collector] Remotive fetch failed: {e}")
@@ -88,7 +88,7 @@ def fetch_arbeitnow():
                     item.get("created_at", time.time()), tz=timezone.utc
                 ).isoformat() if item.get("created_at") else "",
                 "source": "Arbeitnow",
-                "description": (item.get("description") or "")[:500],
+                "description": (item.get("description") or "")[:2500],
             })
     except Exception as e:
         print(f"[collector] Arbeitnow fetch failed: {e}")
@@ -107,7 +107,7 @@ def fetch_weworkremotely():
                 "url": entry.get("link", ""),
                 "posted_at": entry.get("published", ""),
                 "source": "WeWorkRemotely",
-                "description": (entry.get("summary") or "")[:500],
+                "description": (entry.get("summary") or "")[:2500],
             })
     except Exception as e:
         print(f"[collector] WeWorkRemotely fetch failed: {e}")
