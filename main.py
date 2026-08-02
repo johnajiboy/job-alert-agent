@@ -10,6 +10,7 @@ Flow:
 """
 
 import sys
+import time
 import yaml
 
 from collector import collect_jobs
@@ -44,18 +45,26 @@ def run():
 
     print(f"[main] {len(new_jobs)} new job(s) to process")
 
-    # 3. AI Reasoning Layer - filter noise + format for WhatsApp
-    digest = build_digest(new_jobs, sent_ids, config)
-    if digest is None:
+    # 3. AI Reasoning Layer - filter noise + format for WhatsApp, one
+    #    message per job rather than a single bundled digest
+    messages = build_digest(new_jobs, sent_ids, config)
+    if not messages:
         print("[main] Claude determined nothing worth sending - exiting cleanly")
         return
 
-    # 5. Delivery Layer
-    sent_ok = send_whatsapp_message(digest, config)
+    # 5. Delivery Layer - send each job as its own separate message, with
+    #    a short delay so they arrive as distinct WhatsApp messages
+    #    instead of all landing at once.
+    all_sent_ok = True
+    for i, message in enumerate(messages):
+        if not send_whatsapp_message(message, config):
+            all_sent_ok = False
+        if i < len(messages) - 1:
+            time.sleep(2)
 
-    # 4b. Only log jobs as "sent" if delivery actually succeeded, so a
-    #     failed WhatsApp send doesn't silently lose the job forever.
-    if sent_ok:
+    # 4b. Only log jobs as "sent" if every message in the batch actually
+    #     delivered, so a partial failure doesn't silently lose a job.
+    if all_sent_ok:
         save_new_sent(config, new_jobs)
     else:
         print("[main] delivery failed - NOT updating state, will retry next run")
