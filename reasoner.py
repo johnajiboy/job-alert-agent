@@ -102,8 +102,6 @@ def build_digest(jobs: list, sent_ids: set, config: dict) -> str | None:
         print(f"[reasoner] Claude call failed: {e}")
         text = _fallback_format(jobs, sent_ids)
 
-    print(f"[reasoner] raw Claude response ({len(text)} chars): {text}")
-
     if text.strip() == "No new matching jobs this cycle.":
         return None
 

@@ -47,14 +47,12 @@ def send_whatsapp_message(message: str, config: dict) -> bool:
             "type": "text",
             "text": {"body": message},
         }
-        resp = None
         try:
             resp = requests.post(url, headers=headers, json=payload, timeout=20)
             resp.raise_for_status()
             print(f"[delivery] sent to {number}")
         except Exception as e:
-            body = resp.text if resp is not None else "(no response)"
-            print(f"[delivery] send to {number} failed: {e} - response body: {body}")
+            print(f"[delivery] send to {number} failed: {e}")
             all_ok = False
 
     return all_ok
