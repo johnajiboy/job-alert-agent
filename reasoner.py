@@ -17,13 +17,17 @@ exact-ID matching alone would miss.
 
 import os
 import json
+from datetime import datetime, timezone
 from anthropic import Anthropic
 
 PROMPT_TEMPLATE = """<role>You are a job-alert formatting assistant for a WhatsApp group.</role>
+<current_time_utc>{current_time_utc}</current_time_utc>
 <instruction>
 From the job listings provided in <jobs>, keep only roles matching
-"{keywords}" posted within the last {max_age_hours} hours. Remove any job
-whose "id" appears in <already_sent>. Also remove near-duplicate postings
+"{keywords}" posted within the last {max_age_hours} hours, computed
+relative to <current_time_utc> above (each job's "posted_at" field is
+already ISO-8601 or a similar parseable timestamp). Remove any job whose
+"id" appears in <already_sent>. Also remove near-duplicate postings
 (same role, same company, appearing under a different id from another
 source) - keep only the first occurrence. Output a WhatsApp-ready digest
 using the <output_format> below, keeping at most 2 jobs per message
@@ -79,6 +83,7 @@ def build_digest(jobs: list, sent_ids: set, config: dict) -> str | None:
         return None
 
     prompt = PROMPT_TEMPLATE.format(
+        current_time_utc=datetime.now(timezone.utc).isoformat(),
         keywords=", ".join(config.get("keywords", [])),
         max_age_hours=config.get("max_age_hours", 2),
         jobs_json=json.dumps(jobs, indent=2)[:12000],
