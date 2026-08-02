@@ -98,12 +98,28 @@ def build_digest(jobs: list, sent_ids: set, config: dict) -> str | None:
 
 def _fallback_format(jobs: list, sent_ids: set) -> str:
     """Deterministic formatter used only if the Claude API call itself
-    errors out, so a transient API issue doesn't lose a run entirely."""
-    unseen = [j for j in jobs if str(j["id"]) not in sent_ids][:8]
+    errors out, so a transient API issue doesn't lose a run entirely.
+    Roughly mirrors the richer PROMPT_TEMPLATE style, but with no LLM to
+    judge what's genuinely present - it just prints whatever fields exist
+    on the job dict and skips whatever's empty, capped at 2 jobs per
+    message for the same 4096-character WhatsApp limit reason."""
+    unseen = [j for j in jobs if str(j["id"]) not in sent_ids][:2]
     if not unseen:
         return "No new matching jobs this cycle."
-    lines = ["*New Job Alerts* 🚀"]
-    for i, j in enumerate(unseen, 1):
-        lines.append(f"{i}. {j['title']} – {j.get('company','')}")
-        lines.append(f"   Apply: {j['url']}")
-    return "\n".join(lines)
+
+    blocks = []
+    for j in unseen:
+        lines = [f"🚀 *{j.get('title', '')}*"]
+        if j.get("company"):
+            lines.append(f"🏢 Company: {j['company']}")
+        if j.get("location"):
+            lines.append(f"📍 Location: {j['location']}")
+        if j.get("description"):
+            lines.append("")
+            lines.append(j["description"])
+        if j.get("url"):
+            lines.append("")
+            lines.append(f"🔗 Apply: {j['url']}")
+        blocks.append("\n".join(lines))
+
+    return "\n\n".join(blocks)
