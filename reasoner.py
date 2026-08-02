@@ -38,6 +38,13 @@ If the description doesn't mention responsibilities, requirements, a
 contact email, or a deadline, omit that section/line entirely rather than
 inventing or guessing content. The overview sentence(s) must also be a
 faithful summary of the actual description, not invented detail.
+
+CRITICAL - output only the final digest: do not show your reasoning,
+analysis, or any explanation of which jobs were included/excluded and
+why. No preamble, no step-by-step walkthrough, no commentary before or
+after the digest. Your entire response must be either the formatted
+digest itself or the exact string "No new matching jobs this cycle." -
+nothing else.
 </instruction>
 <jobs>{jobs_json}</jobs>
 <already_sent>{sent_ids_json}</already_sent>
