@@ -122,21 +122,7 @@ the WhatsApp messages received, and the Google Sheet rows.
 - Only numbers that have explicitly opted in (verified as test recipients,
   or members of a broadcast list you administer) receive messages.
 
-## Submission checklist (per the brief)
 
-- [ ] Full source code — this repo (`main.py`, `collector.py`,
-      `reasoner.py`, `state_store.py`, `delivery.py`,
-      `.github/workflows/job-agent.yml`, `config.yaml`)
-- [ ] The prompt used in the AI Reasoning Layer — see `PROMPT_TEMPLATE` in
-      `reasoner.py`
-- [ ] Architecture diagram — see the ASCII diagram below (redraw in any
-      free tool, e.g. draw.io or Google Sheets shapes, if a visual is
-      required)
-- [ ] Screenshots of 3+ successful runs, 2h apart, no duplicates
-- [ ] 200–400 word write-up: chosen function, free tools used, one
-      challenge solved (e.g. the group-delivery limitation above is a
-      strong candidate to write about)
-- [ ] File named `Project_[YourName]_WhatsAppJobAgent.zip`
 
 ```
 GitHub Actions cron (every 2h)
