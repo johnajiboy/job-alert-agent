@@ -15,9 +15,8 @@ relative to <current_time_utc> above (each job's "posted_at" field is
 already ISO-8601 or a similar parseable timestamp). Remove any job whose
 "id" appears in <already_sent>. Also remove near-duplicate postings
 (same role, same company, appearing under a different id from another
-source) - keep only the first occurrence. Keep at most 2 qualifying jobs
-total (WhatsApp caps messages at 4096 characters and this fuller format
-takes more space per job).
+source) - keep only the first occurrence. Keep at most 5 qualifying jobs
+total.
 
 Each qualifying job is sent to WhatsApp as its own separate message, not
 bundled together. Output each job as a complete, standalone message using
