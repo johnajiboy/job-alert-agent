@@ -117,10 +117,10 @@ def _fallback_format(jobs: list, sent_ids: set) -> str:
     errors out, so a transient API issue doesn't lose a run entirely.
     Roughly mirrors the richer PROMPT_TEMPLATE style, but with no LLM to
     judge what's genuinely present - it just prints whatever fields exist
-    on the job dict and skips whatever's empty, capped at 2 jobs total.
+    on the job dict and skips whatever's empty, capped at 5 jobs total.
     Joins jobs with the same ===JOB_BREAK=== delimiter Claude uses, so
     build_digest() splits both paths identically into separate messages."""
-    unseen = [j for j in jobs if str(j["id"]) not in sent_ids][:2]
+    unseen = [j for j in jobs if str(j["id"]) not in sent_ids][:5]
     if not unseen:
         return "No new matching jobs this cycle."
 
